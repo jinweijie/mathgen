@@ -11,6 +11,14 @@
             font-family: "Source Sans Pro", "Helvetica Neue", Arial, sans-serif;
         }
 
+        label{
+            font-size: 12px;
+        }
+
+        input{
+            width: 40px;
+        }
+
         .container ul{
             padding: 0;
         }
@@ -50,14 +58,38 @@
 </head>
 <body>
     <div id="app" class="container">
-        <ul>
-            <li v-for="(item, i) in items">
-                    <div class="question">
-                        <span class="index">({{i + 1}})</span>
-                        <span class="question-body" v-for="(token, j) in item"><span class="answer" v-if="token == CONSTS.ANSWER_PH">{{token}}</span><span class="token" v-if="token != CONSTS.ANSWER_PH">{{token}}</span></span>
-                    </div>
-            </li>
-          </ul>
+        <div>
+            <h3>Simple Math Problem Generator / 简易数学题生成器 - jinweijie[AT]gmail.com</h3>
+        </div>
+        <div>
+            <label>Min / 最小值:</label>
+            <input type="text" v-model="min" />
+            
+            <label>Max / 最大值:</label>
+            <input type="text" v-model="max" />
+
+            <label>Problem Number / 题目数:</label>
+            <input type="text" v-model="problemCount" />
+
+            <label>Two Numbers / 两个数加减:</label>
+            <input type="checkbox" v-model="twoNumber" />
+
+            <label>Three Numbers / 三个数加减:</label>
+            <input type="checkbox" v-model="threeNumber" />
+
+            <button v-on:click="generate()">Generate / 生成</button>
+        </div>
+        <div>
+            <ul>
+                <li v-for="(item, i) in items">
+                        <div class="question">
+                            <span class="index">({{i + 1}})</span>
+                            <span class="question-body" v-for="(token, j) in item"><span class="answer" v-if="token == CONSTS.ANSWER_PH">{{token}}</span><span class="token" v-if="token != CONSTS.ANSWER_PH">{{token}}</span></span>
+                        </div>
+                </li>
+            </ul>
+        </div>
+        
     </div>
 
     <script>
@@ -67,6 +99,11 @@
                 CONSTS :{
                     ANSWER_PH : '[ 　 ]'
                 },
+                min: 0,
+                max: 10,
+                problemCount: 30,
+                twoNumber: true,
+                threeNumber: false,
                 items : []//this.genPlus1(0, 10) //[['1','+','1','=','2'],]
             },
             methods:{
@@ -196,25 +233,33 @@
                     }
 
                     return result;
+                },
+                generate: function(){
+                    var total = [];
+
+                    if( this.twoNumber ){ 
+                        var plus_2_1 = this.genPlus_2_1(this.min, this.max);
+                        var plus_2_2 = this.genPlus_2_2(this.min, this.max);
+                        var plus_2_3 = this.genPlus_2_3(this.min, this.max);
+
+                        var minus_2_1 = this.genMinus_2_1(this.min, this.max);
+                        var minus_2_2 = this.genMinus_2_2(this.min, this.max);
+                        var minus_2_3 = this.genMinus_2_3(this.min, this.max);
+                        
+                        var total = total.concat(plus_2_1, plus_2_2, plus_2_3,minus_2_1, minus_2_2, minus_2_3, mix_3_1 );
+                    }
+
+                    if( this.threeNumber ){
+                        var mix_3_1 = this.genMix_3_1(this.min, this.max);
+                        var total = total.concat(mix_3_1);
+                    }
+
+
+                    this.items = this.pickRandom(total, this.problemCount);
                 }
             },
             created: function(){
-                var min = 0;
-                var max = 10;
-
-                var plus_2_1 = this.genPlus_2_1(min,max);
-                var plus_2_2 = this.genPlus_2_2(min,max);
-                var plus_2_3 = this.genPlus_2_3(min,max);
-
-                var minus_2_1 = this.genMinus_2_1(min,max);
-                var minus_2_2 = this.genMinus_2_2(min,max);
-                var minus_2_3 = this.genMinus_2_3(min,max);
-
-                var mix_3_1 = this.genMix_3_1(min, max,);
-
-                var total = plus_2_1.concat(plus_2_2, plus_2_3,minus_2_1, minus_2_2, minus_2_3, mix_3_1 );
-
-                this.items = this.pickRandom(total, 30);
+                this.generate();
             }
         });
 
