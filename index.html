@@ -1,1 +1,223 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Simple Math Problem Generator</title>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vue"></script>
+    <style>
+        body{
+            font-family: "Source Sans Pro", "Helvetica Neue", Arial, sans-serif;
+        }
 
+        .container ul{
+            padding: 0;
+        }
+
+        .container li{
+            display: inline-block;
+            width: 300px;
+            padding: 4px;
+        }
+
+        .question{
+            display: inline-block;
+        }
+
+        .index{
+            display: inline-block;
+            width: 50px;
+        }
+
+
+        .question-body{
+            display: inline-block;
+        }
+
+        .answer{
+            display: inline-block;
+            width: 50px;
+        }
+
+        .token{
+            display: inline-block;
+            width: 26px;
+            white-space: pre;
+
+        }
+    </style>
+</head>
+<body>
+    <div id="app" class="container">
+        <ul>
+            <li v-for="(item, i) in items">
+                    <div class="question">
+                        <span class="index">({{i + 1}})</span>
+                        <span class="question-body" v-for="(token, j) in item"><span class="answer" v-if="token == CONSTS.ANSWER_PH">{{token}}</span><span class="token" v-if="token != CONSTS.ANSWER_PH">{{token}}</span></span>
+                    </div>
+            </li>
+          </ul>
+    </div>
+
+    <script>
+        var app = new Vue({
+            el: '#app',
+            data: {
+                CONSTS :{
+                    ANSWER_PH : '[ 　 ]'
+                },
+                items : []//this.genPlus1(0, 10) //[['1','+','1','=','2'],]
+            },
+            methods:{
+                pickRandom: function(a, n){
+                    this.shuffle(a);
+                    return a.slice(0, n);
+                },
+                shuffle: function(a) {
+                    for (let i = a.length; i; i--) {
+                        let j = Math.floor(Math.random() * i);
+                        [a[i - 1], a[j]] = [a[j], a[i - 1]];
+                    }
+                },
+                // 1 + 1 = [ ]
+                genPlus_2_1: function(min, max){
+                    var result = [];
+                    
+                    for(var i = min; i <= max; i++){
+                        for(var j = min; j <= max; j++){
+                            if( i + j > max )
+                                continue;
+                            
+                            result.push( [i, '+', j, '=', this.CONSTS.ANSWER_PH ]);
+                        }                
+                    }
+
+                    return result;
+                },
+                // 1 + [] = 2
+                genPlus_2_2: function(min, max){
+                    var result = [];
+                    
+                    for(var i = min; i <= max; i++){
+                        for(var j = min; j <= max; j++){
+                            if( j > i )
+                                continue;
+                            
+                            result.push( [i, '+', this.CONSTS.ANSWER_PH , '=', j]);
+                        }                
+                    }
+
+                    return result;
+                },
+                // [] + 1 = 2
+                genPlus_2_3: function(min, max){
+                    var result = [];
+                    
+                    for(var i = min; i <= max; i++){
+                        for(var j = min; j <= max; j++){
+                            if( j > i )
+                                continue;
+                            
+                            result.push( [this.CONSTS.ANSWER_PH, '+', i, '=', j]);
+                        }                
+                    }
+
+                    return result;
+                },
+                // 2 - 1 = []
+                genMinus_2_1: function(min, max){
+                    var result = [];
+            
+                    for(var i = max; i >= min; i--){
+                        for(var j = max; j >= min; j--){
+                            if( i - j < 0 )
+                                continue;
+                            
+                            result.push( [i, '-', j, '=', this.CONSTS.ANSWER_PH]);
+                        }                
+                    }
+
+                    return result;
+                },
+                // 2 - [] = 1
+                genMinus_2_2: function(min, max){
+                    var result = [];
+            
+                    for(var i = max; i >= min; i--){
+                        for(var j = max; j >= min; j--){
+                            if( i - j < 0 )
+                                continue;
+                            
+                            result.push( [i, '-',this.CONSTS.ANSWER_PH , '=', j]);
+                        }                
+                    }
+
+                    return result;
+                },
+                // [] - 2 = 1
+                genMinus_2_3: function(min, max){
+                    var result = [];
+            
+                    for(var i = max; i >= min; i--){
+                        for(var j = max; j >= min; j--){
+                            if( i + j > max )
+                                continue;
+                            
+                            result.push( [this.CONSTS.ANSWER_PH, '-',i , '=', j]);
+                        }                
+                    }
+
+                    return result;
+                },
+                // 1 + 1 + 1= [ ]
+                genMix_3_1: function(min, max){
+                    var result = [];
+                    
+                    for(var i = min; i <= max; i++){
+                        for(var j = min; j <= max; j++){
+                            for(var k = min; k <= max; k++){
+                                if( i + j + k <= max ){
+                                    result.push( [i, '+', j, '+', k, '=', this.CONSTS.ANSWER_PH ]);
+                                }
+                                else if(i + j <= max && i + j - k <= max && i + j - k >= 0){
+                                    result.push( [i, '+', j, '-', k, '=', this.CONSTS.ANSWER_PH ]);
+                                }
+                                else if(i + k <= max && i - j + k <= max && i - j >= 0){
+                                    result.push( [i, '-', j, '+', k, '=', this.CONSTS.ANSWER_PH ]);
+                                }
+                                else if(i - j - k >= 0){
+                                    result.push( [i, '-', j, '-', k, '=', this.CONSTS.ANSWER_PH ]);
+                                }
+                                    
+                                
+                            }
+                        }                
+                    }
+
+                    return result;
+                }
+            },
+            created: function(){
+                var min = 0;
+                var max = 10;
+
+                var plus_2_1 = this.genPlus_2_1(min,max);
+                var plus_2_2 = this.genPlus_2_2(min,max);
+                var plus_2_3 = this.genPlus_2_3(min,max);
+
+                var minus_2_1 = this.genMinus_2_1(min,max);
+                var minus_2_2 = this.genMinus_2_2(min,max);
+                var minus_2_3 = this.genMinus_2_3(min,max);
+
+                var mix_3_1 = this.genMix_3_1(min, max,);
+
+                var total = plus_2_1.concat(plus_2_2, plus_2_3,minus_2_1, minus_2_2, minus_2_3, mix_3_1 );
+
+                this.items = this.pickRandom(total, 30);
+            }
+        });
+
+    </script>   
+</body>
+</html>
