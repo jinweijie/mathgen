@@ -63,6 +63,21 @@
                 display: none;
             }
         }
+
+        @media only screen and (min-device-width : 320px) and (max-device-width : 480px) {
+            .options span{
+                display: block;
+            }
+
+            .options span label{
+                display: inline-block;
+                width: 180px;
+            }
+
+            .options button{
+                float: right;
+            }
+        }
     </style>
 </head>
 <body>
@@ -71,21 +86,30 @@
             <h3>Simple Math Problem Generator / 简易数学题生成器 - jinweijie</h3>
         </div>
         <div class="options">
-            <label>Min / 最小值:</label>
-            <input type="text" v-model="min" />
-            
-            <label>Max / 最大值:</label>
-            <input type="text" v-model="max" />
+            <span>
+                <label>Min / 最小值:</label>
+                <input type="text" v-model="min" />
+            </span>
 
-            <label>Problem Number / 题目数:</label>
-            <input type="text" v-model="problemCount" />
+            <span>
+                <label>Max / 最大值:</label>
+                <input type="text" v-model="max" />
+            </span>
 
-            <label>Two Numbers / 两个数加减:</label>
-            <input type="checkbox" v-model="twoNumber" />
+            <span>
+                <label>Problem Number / 题目数:</label>
+                <input type="text" v-model="problemCount" />
+            </span>
 
-            <label>Three Numbers / 三个数加减:</label>
-            <input type="checkbox" v-model="threeNumber" />
+            <span>
+                <label>Two Numbers / 两个数加减:</label>
+                <input type="checkbox" v-model="twoNumber" />
+            </span>
 
+            <span>
+                <label>Three Numbers / 三个数加减:</label>
+                <input type="checkbox" v-model="threeNumber" />
+            </span>
             <button v-on:click="generate()">Generate / 生成</button>
         </div>
         <div>
