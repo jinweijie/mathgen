@@ -58,6 +58,11 @@
             margin: 2px 10px;
         }
 
+        .options span{
+            border: 1px solid #ddd;
+            padding: 6px 8px;
+        }
+
         @media print{
             .options{
                 display: none;
@@ -100,15 +105,20 @@
                 <label>Problem Number / 题目数:</label>
                 <input type="text" v-model="problemCount" />
             </span>
-
+  
             <span>
-                <label>Two Numbers / 两个数加减:</label>
-                <input type="checkbox" v-model="twoNumber" />
+                <label for="answerOnRightOnly">Answer on right / 填空只在等号右边:</label>
+                <input id="answerOnRightOnly" type="checkbox" v-model="answerOnRightOnly" />
             </span>
 
             <span>
-                <label>Three Numbers / 三个数加减:</label>
-                <input type="checkbox" v-model="threeNumber" />
+                <label for="twoNumberPlusMinus">2-Num +- / 两个数加减:</label>
+                <input id="twoNumberPlusMinus" type="checkbox" v-model="twoNumberPlusMinus" />
+            </span>
+
+            <span>
+                <label for="threeNumberPlusMinus">3-Num +- / 三个数加减:</label>
+                <input id="threeNumberPlusMinus" type="checkbox" v-model="threeNumberPlusMinus" />
             </span>
             <button v-on:click="generate()">Generate / 生成</button>
         </div>
@@ -138,8 +148,9 @@
                 min: 0,
                 max: 10,
                 problemCount: 30,
-                twoNumber: true,
-                threeNumber: false,
+                twoNumberPlusMinus: true,
+                threeNumberPlusMinus: false,
+                answerOnRightOnly: false,
                 items : []//this.genPlus1(0, 10) //[['1','+','1','=','2'],]
             },
             computed:{
@@ -167,117 +178,142 @@
                         [a[i - 1], a[j]] = [a[j], a[i - 1]];
                     }
                 },
-                // 1 + 1 = [ ]
-                genPlus_2_1: function(min, max){
-                    var result = [];
-                    
-                    for(var i = min; i <= max; i++){
-                        for(var j = min; j <= max; j++){
-                            if( i + j > max )
-                                continue;
-                            
-                            result.push( [i, '+', j, '=', this.CONSTS.ANSWER_PH ]);
-                        }                
-                    }
-
-                    return result;
-                },
-                // 1 + [] = 2
-                genPlus_2_2: function(min, max){
-                    var result = [];
-                    
-                    for(var i = min; i <= max; i++){
-                        for(var j = min; j <= max; j++){
-                            if( j - i < 0 )
-                                continue;
-                            
-                            result.push( [i, '+', this.CONSTS.ANSWER_PH , '=', j]);
-                        }                
-                    }
-
-                    return result;
-                },
-                // [] + 1 = 2
-                genPlus_2_3: function(min, max){
-                    var result = [];
-                    
-                    for(var i = min; i <= max; i++){
-                        for(var j = min; j <= max; j++){
-                            if( j - i < 0 )
-                                continue;
-                            
-                            result.push( [this.CONSTS.ANSWER_PH, '+', i, '=', j]);
-                        }                
-                    }
-
-                    return result;
-                },
-                // 2 - 1 = []
-                genMinus_2_1: function(min, max){
+                getMix_2_1: function(min, max){
                     var result = [];
             
                     for(var i = max; i >= min; i--){
                         for(var j = max; j >= min; j--){
-                            if( i - j < 0 )
-                                continue;
-                            
-                            result.push( [i, '-', j, '=', this.CONSTS.ANSWER_PH]);
+
+                            for(var x = min; x <= max; x++){
+                                // 1 + 1 = [ ]
+                                if( i + j == x ){
+                                    result.push( [i, '+', j, '=', this.CONSTS.ANSWER_PH ]);
+                                }
+
+                                // 2 - 1 = []
+                                if( i - j == x){
+                                    result.push( [i, '-', j, '=', this.CONSTS.ANSWER_PH]);
+                                }
+
+                                if( !this.answerOnRightOnly ){
+                                    
+                                    if( i + x == j ){
+                                        // 1 + [] = 2
+                                        result.push( [i, '+', this.CONSTS.ANSWER_PH , '=', j]);
+                                    }
+                                    
+                                    if( x + i == j ){
+                                        // [] + 1 = 2
+                                        result.push( [this.CONSTS.ANSWER_PH, '+', i, '=', j]);
+                                    }
+
+                                    // 2 - [] = 1
+                                    if( i - x == j ){
+                                        result.push( [i, '-',this.CONSTS.ANSWER_PH , '=', j]); 
+                                    }
+
+                                    // [] - 2 = 1
+                                    if( x - i == j ){
+                                        result.push( [this.CONSTS.ANSWER_PH, '-',i , '=', j]);
+                                    }
+                                }
+                            }
                         }                
                     }
 
                     return result;
                 },
-                // 2 - [] = 1
-                genMinus_2_2: function(min, max){
-                    var result = [];
-            
-                    for(var i = max; i >= min; i--){
-                        for(var j = max; j >= min; j--){
-                            if( i - j < 0 )
-                                continue;
-                            
-                            result.push( [i, '-',this.CONSTS.ANSWER_PH , '=', j]);
-                        }                
-                    }
-
-                    return result;
-                },
-                // [] - 2 = 1
-                genMinus_2_3: function(min, max){
-                    var result = [];
-            
-                    for(var i = max; i >= min; i--){
-                        for(var j = max; j >= min; j--){
-                            if( i + j > max )
-                                continue;
-                            
-                            result.push( [this.CONSTS.ANSWER_PH, '-',i , '=', j]);
-                        }                
-                    }
-
-                    return result;
-                },
-                // 1 + 1 + 1= [ ]
                 genMix_3_1: function(min, max){
                     var result = [];
                     
                     for(var i = min; i <= max; i++){
                         for(var j = min; j <= max; j++){
                             for(var k = min; k <= max; k++){
-                                if( i + j + k <= max ){
-                                    result.push( [i, '+', j, '+', k, '=', this.CONSTS.ANSWER_PH ]);
-                                }
-                                else if(i + j <= max && i + j - k <= max && i + j - k >= 0){
-                                    result.push( [i, '+', j, '-', k, '=', this.CONSTS.ANSWER_PH ]);
-                                }
-                                else if(i + k <= max && i - j + k <= max && i - j >= 0){
-                                    result.push( [i, '-', j, '+', k, '=', this.CONSTS.ANSWER_PH ]);
-                                }
-                                else if(i - j - k >= 0){
-                                    result.push( [i, '-', j, '-', k, '=', this.CONSTS.ANSWER_PH ]);
-                                }
+
+                                for(var x = min; x <= max; x++){
+                                    //1 + 1 + 1= [ ]
+                                    if( i + j + k == x){ 
+                                        result.push( [i, '+', j, '+', k, '=', this.CONSTS.ANSWER_PH ]);
+                                    }
+
+                                    //1 + 1 - 1= [ ]
+                                    if(i + j - k == x && i + j <= max){
+                                        result.push( [i, '+', j, '-', k, '=', this.CONSTS.ANSWER_PH ]);
+                                    }
+
+                                    //1 - 1 + 1= [ ]
+                                    if(i - j + k == x && i >= j){
+                                        result.push( [i, '-', j, '+', k, '=', this.CONSTS.ANSWER_PH ]);
+                                    }
+
+                                    //2 - 1 - 1= [ ]
+                                    if(i - j - k == x){
+                                        result.push( [i, '-', j, '-', k, '=', this.CONSTS.ANSWER_PH ]);
+                                    }
+
+                                    if( !this.answerOnRightOnly ){
+                                        
+                                        //[ ] + 1 + 1 = 2 
+                                        if( x + i + j == k ){
+                                            result.push( [this.CONSTS.ANSWER_PH, '+', i, '+', j, '=', k ]);
+                                        }
+
+                                        //1 + [ ] + 1 = 2
+                                        if(i + x + j == k){
+                                            result.push( [i, '+', this.CONSTS.ANSWER_PH , '+', j, '=', k ]);
+                                        }
+                                        
+                                        //1 + 1 + [ ] = 2
+                                        if(i + j + x == k){
+                                            result.push( [i, '+', j, '+', this.CONSTS.ANSWER_PH , '=', k ]);
+                                        }
+
+                                        //[] - 1 + 1 = 1
+                                        if( x - i + j == k && x >= i){
+                                            result.push( [this.CONSTS.ANSWER_PH, '-', i, '+', j, '=', k ]);
+                                        }
                                     
+                                        //2 - [] + 1 = 1
+                                        if( i - x + j == k && i - x >= 0){
+                                            result.push( [i, '-', this.CONSTS.ANSWER_PH, '+', j, '=', k ]);
+                                        }
+                                    
+                                        //2 - 1 + [] = 1
+                                        if(i - j + x == k && i >= j){
+                                            result.push( [i, '-', j, '+', this.CONSTS.ANSWER_PH, '=', k ]);
+                                        }
+                                    
+                                        //[] + 1 - 1 = 1
+                                        if( x + i - j == k && i + x <= max ){
+                                            result.push( [this.CONSTS.ANSWER_PH, '+', i, '-', j, '=', k ]);
+                                        }
+
+                                        //2 + [] - 1 = 1
+                                        if( i + x - j == k && i + x <= max ){
+                                            result.push( [i, '+', this.CONSTS.ANSWER_PH, '-', j, '=', k ]);
+                                        }
                                 
+                                        //2 + 1 - [] = 1
+                                        if( i + j - x == k && i + x <= max ){
+                                            result.push( [i, '+', j, '-', this.CONSTS.ANSWER_PH, '=', k ]);
+                                        }
+                                
+                                        //[] - 1 - 1 = 1
+                                        if( x - i - j == k && i + x <= max ){
+                                            result.push( [this.CONSTS.ANSWER_PH, '-', i , '-', j , '=', k ]);
+                                        }
+
+                                        //2 - [] - 1 = 1
+                                        if( i - x - j == k && i + x <= max ){
+                                            result.push( [i, '-', this.CONSTS.ANSWER_PH , '-', j , '=', k ]);
+                                        }
+
+                                        //2 - 1 - [] = 1
+                                        if( i - j - x == k && i + x <= max ){
+                                            result.push( [i, '-', j , '-', this.CONSTS.ANSWER_PH , '=', k ]);
+                                        }
+                                    }
+                                }
                             }
                         }                
                     }
@@ -287,23 +323,15 @@
                 generate: function(){
                     var total = [];
 
-                    if( this.twoNumber ){ 
-                        var plus_2_1 = this.genPlus_2_1(this.min, this.max);
-                        var plus_2_2 = this.genPlus_2_2(this.min, this.max);
-                        var plus_2_3 = this.genPlus_2_3(this.min, this.max);
-
-                        var minus_2_1 = this.genMinus_2_1(this.min, this.max);
-                        var minus_2_2 = this.genMinus_2_2(this.min, this.max);
-                        var minus_2_3 = this.genMinus_2_3(this.min, this.max);
-                        
-                        var total = total.concat(plus_2_1, plus_2_2, plus_2_3,minus_2_1, minus_2_2, minus_2_3, mix_3_1 );
+                    if( this.twoNumberPlusMinus ){ 
+                        var mix_2_1 = this.getMix_2_1(this.min, this.max);                        
+                        var total = total.concat(mix_2_1);
                     }
 
-                    if( this.threeNumber ){
+                    if( this.threeNumberPlusMinus ){
                         var mix_3_1 = this.genMix_3_1(this.min, this.max);
                         var total = total.concat(mix_3_1);
                     }
-
 
                     this.items = this.pickRandom(total, this.problemCount);
                 }
