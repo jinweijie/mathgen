@@ -180,11 +180,11 @@
                 },
                 getMix_2_1: function(min, max){
                     var result = [];
-            
-                    for(var i = max; i >= min; i--){
-                        for(var j = max; j >= min; j--){
-
+                    
+                    for(var i = min; i <= max; i++){
+                        for(var j = min; j <= max; j++){
                             for(var x = min; x <= max; x++){
+                                
                                 // 1 + 1 = [ ]
                                 if( i + j == x ){
                                     result.push( [i, '+', j, '=', this.CONSTS.ANSWER_PH ]);
@@ -229,7 +229,6 @@
                     for(var i = min; i <= max; i++){
                         for(var j = min; j <= max; j++){
                             for(var k = min; k <= max; k++){
-
                                 for(var x = min; x <= max; x++){
                                     //1 + 1 + 1= [ ]
                                     if( i + j + k == x){ 
