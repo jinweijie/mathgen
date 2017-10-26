@@ -323,16 +323,16 @@
                     var total = [];
 
                     if( this.twoNumberPlusMinus ){ 
-                        var mix_2_1 = this.getMix_2_1(this.min, this.max);                        
+                        var mix_2_1 = this.getMix_2_1(parseInt(this.min), parseInt(this.max));                        
                         var total = total.concat(mix_2_1);
                     }
 
                     if( this.threeNumberPlusMinus ){
-                        var mix_3_1 = this.genMix_3_1(this.min, this.max);
+                        var mix_3_1 = this.genMix_3_1(parseInt(this.min), parseInt(this.max));
                         var total = total.concat(mix_3_1);
                     }
 
-                    this.items = this.pickRandom(total, this.problemCount);
+                    this.items = this.pickRandom(total, parseInt(this.problemCount));
                 }
             },
             created: function(){
