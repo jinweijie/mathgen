@@ -120,6 +120,18 @@
                 <label for="threeNumberPlusMinus">3-Num +- / 三个数加减:</label>
                 <input id="threeNumberPlusMinus" type="checkbox" v-model="threeNumberPlusMinus" />
             </span>
+
+            <span>
+                <label for="twoNumberMultiply">2-Num x / 两个数乘法:</label>
+                <input id="twoNumberMultiply" type="checkbox" v-model="twoNumberMultiply" />
+            </span>
+
+            
+            <span>
+                <label for="twoNumberDivide">2-Num ÷ / 两个数除法:</label>
+                <input id="twoNumberDivide" type="checkbox" v-model="twoNumberDivide" />
+            </span>
+
             <button v-on:click="generate()">Generate / 生成</button>
         </div>
         <div>
@@ -151,6 +163,8 @@
                 twoNumberPlusMinus: true,
                 threeNumberPlusMinus: false,
                 answerOnRightOnly: false,
+                twoNumberMultiply: false,
+                twoNumberDivide: false,
                 items : []//this.genPlus1(0, 10) //[['1','+','1','=','2'],]
             },
             computed:{
@@ -319,17 +333,70 @@
 
                     return result;
                 },
+                genMultiply: function(min, max){
+                    var result = [];
+                    
+                    for(var i = min; i <= max; i++){
+                        for(var j = min; j <= max; j++){
+
+                            var a = i * j;
+                           
+                             // 1 x 1 = [ ]
+                             result.push( [i, '×', j, '=', this.CONSTS.ANSWER_PH ]);
+                             
+                            if( !this.answerOnRightOnly ){
+                                // [ ] x 1 = 1
+                                result.push( [this.CONSTS.ANSWER_PH, '×', j, '=', a ]);
+                                // 1 x [ ] = 1
+                                result.push( [i, '×', this.CONSTS.ANSWER_PH, '=', a ]);
+                            }
+                        }                
+                    }
+
+                    return result;
+                },
+                genDivide: function(min, max){
+                    var result = [];
+                    
+                    for(var i = min; i <= max; i++){
+                        for(var j = min; j <= max; j++){
+
+                            var a = i * j;
+                            // 1 / 1 = [ ]
+                            result.push( [a, '÷', i, '=', this.CONSTS.ANSWER_PH ]);
+
+                            if( !this.answerOnRightOnly ){
+                                // [ ] / 1 = 1
+                                result.push( [this.CONSTS.ANSWER_PH, '÷', i, '=', j ]);
+                                // 1 / [ ] = 1
+                                result.push( [a, '÷', this.CONSTS.ANSWER_PH, '=', i ]);
+                            }
+                        }                
+                    }
+
+                    return result;
+                },
                 generate: function(){
                     var total = [];
 
                     if( this.twoNumberPlusMinus ){ 
                         var mix_2_1 = this.getMix_2_1(parseInt(this.min), parseInt(this.max));                        
-                        var total = total.concat(mix_2_1);
+                        total = total.concat(mix_2_1);
                     }
 
                     if( this.threeNumberPlusMinus ){
                         var mix_3_1 = this.genMix_3_1(parseInt(this.min), parseInt(this.max));
-                        var total = total.concat(mix_3_1);
+                        total = total.concat(mix_3_1);
+                    }
+
+                    if(this.twoNumberMultiply){
+                        var mul = this.genMultiply(parseInt(this.min), parseInt(this.max));
+                        total = total.concat(mul);
+                    }
+
+                    if(this.twoNumberDivide){
+                        var div = this.genDivide(parseInt(this.min), parseInt(this.max));
+                        total = total.concat(div);
                     }
 
                     this.items = this.pickRandom(total, parseInt(this.problemCount));
